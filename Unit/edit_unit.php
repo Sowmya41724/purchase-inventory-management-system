@@ -1,15 +1,6 @@
 <?php
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "Unit_Product";
-
-$conn = new mysqli($servername, $username, $password, $dbname, 3307);
-
-if ($conn->connect_error) {
-    die("connection failed: " . $conn->connect_error);
-}
+include "../config.php";
 
 $sql = "SELECT * FROM Unit";
 $result = mysqli_query($conn, $sql);

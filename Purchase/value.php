@@ -1,11 +1,7 @@
 <?php
 $q = isset($_GET['q']) ? intval($_GET['q']) : 0;
 
-$con = mysqli_connect('localhost', 'root', '', 'Unit_Product', 3307);
-
-if (!$con) {
-    die('Connection failed: ' . mysqli_connect_error());
-}
+include "../config.php";
 
 $sql = "SELECT unitValue, Rate FROM Product WHERE id = ?";
 $stmt = mysqli_prepare($con, $sql);

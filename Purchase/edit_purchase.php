@@ -1,14 +1,5 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "Unit_Product";
-
-$conn = new mysqli($servername, $username, $password, $dbname, 3307);
-
-if ($conn->connect_error) {
-    die("Connect failed");
-}
+include "../config.php";
 
 $sql = "SELECT * FROM Purchase";
 $result = mysqli_query($conn, $sql);
