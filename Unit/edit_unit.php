@@ -112,11 +112,7 @@ if (isset($_REQUEST['delete_id'])) {
         <h1>Edit Unit Table</h1>
     </header>
     <div class="input-container">
-        <button>
-            <a href="Unit_table.php">
-                &#8617; Back to form
-            </a>
-        </button>
+        <button onclick="location.href='Unit_table.php'" Type="button">&#8617; Back to form</button>
         <table>
             <tr>
                 <th>S.no</th>
@@ -133,17 +129,15 @@ if (isset($_REQUEST['delete_id'])) {
                         <td><?php echo $m; ?></td>
                         <td><?php echo $rows['name']; ?></td>
                         <td id="no-hover">
-                            <button name="edit" type="submit">
-                                <a href="Unit_table.php?edit_id=<?php echo $rows['id']; ?>">
-                                    &#x1F589;Edit
-                                </a>
+                            <button onclick="location.href='Unit_table.php?edit_id=<?php echo $rows['id']; ?>'" name="edit"
+                                type="submit">
+                                &#x1F589;Edit
                             </button>
                             <br>
-                            <button name="delete" type="submit">
-                                <a href="edit_unit.php?delete_id=<?php echo $rows['id']; ?>"
-                                    onclick="return confirm('Are you sure you want to delete this record?');">
-                                    &#x1F5D1;Delete
-                                </a>
+                            <button
+                                onclick="location.href='edit_unit.php?delete_id=<?php echo $rows['id']; ?>'; return confirm('Are you sure you want to delete this record?');"
+                                name="delete" type="submit">
+                                &#x1F5D1;Delete
                             </button>
                         </td>
                     </tr>

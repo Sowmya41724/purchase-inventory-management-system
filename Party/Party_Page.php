@@ -121,8 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (empty($_POST["email"])) {
-        $EmailErr = "Email is required";
-        $error = 1;
+        $EmailErr = "";
     } else {
         $Email = test_input($_POST["email"]);
 
@@ -225,7 +224,7 @@ if (isset($stmt)) {
 
         form {
             padding: 50px 50px 50px 50px;
-            margin: 5%;
+            margin: 5% 30% 5% 30%;
             border-radius: 12px;
             background-color: white;
             color: black;
@@ -326,11 +325,7 @@ if (isset($stmt)) {
     </nav>
 
     <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-        <button>
-            <a href="edit_party.php">
-                &#8618; Database
-            </a>
-        </button>
+        <button onclick="location.href='edit_party.php'" type="button">&#8618; Database</button>
         <h1>Fill the details:</h1>
         <input type="hidden" name="edit_id" value="<?php echo $edit_id; ?>">
         <label for="name">
@@ -358,7 +353,7 @@ if (isset($stmt)) {
         <br><br>
         <input type="text" maxlength="12" name="mobileno" placeholder="Enter the mobile no...."
             value="<?php echo $Mobileno; ?>">
-        <h5>(format: 91 [6 or 7 or 8 or 9]xxxxxxxxx)</h5>
+        <h5>(format: 91[6 or 7 or 8 or 9]xxxxxxxxx)</h5>
 
         <label for="Address">
             <b>
@@ -389,7 +384,8 @@ if (isset($stmt)) {
             </option>
             <option <?php if (isset($City) && $City == "Srivilliputhur") { ?> selected <?php } ?> value="Srivilliputhur">
                 Srivilliputhur</option>
-            <option <?php if (isset($City) && $City == "Sattur") { ?> selected <?php } ?> value="Sattur">Sattur</option>
+            <option <?php if (isset($City) && $City == "Sattur") { ?> selected <?php } ?> value="Sattur">Sattur
+            </option>
         </select>
         <br><br>
 
@@ -407,7 +403,6 @@ if (isset($stmt)) {
                 Email :
             </b>
             <span class="error">
-                *
                 <?php echo $EmailErr; ?>
             </span>
         </label>
@@ -426,8 +421,10 @@ if (isset($stmt)) {
         </label>
         <br><br>
         <select id="party" name="party">
-            <option <?php if (isset($Party_type) && $Party_type == "") { ?> selected <?php } ?> value="">Select</option>
-            <option <?php if (isset($Party_type) && $Party_type == "sales") { ?> selected <?php } ?> value="sales">Sales
+            <option <?php if (isset($Party_type) && $Party_type == "") { ?> selected <?php } ?> value="">Select
+            </option>
+            <option <?php if (isset($Party_type) && $Party_type == "sales") { ?> selected <?php } ?> value="sales">
+                Sales
             </option>
             <option <?php if (isset($Party_type) && $Party_type == "purchase") { ?> selected <?php } ?> value="purchase">
                 Purchase</option>

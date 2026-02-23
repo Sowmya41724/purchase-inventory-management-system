@@ -445,18 +445,18 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                     <select id="Party" name="party">
                         <option value="">Select</option>
                         <?php
-                        $partySQL = "SELECT Party_Type FROM Party";
+                        $partySQL = "SELECT `Name` FROM Party WHERE Party_Type IN ('Purchase', 'Both')";
                         $partyResult = mysqli_query($conn, $partySQL);
                         if (mysqli_num_rows($partyResult) > 0) {
                             while ($partyRow = mysqli_fetch_assoc($partyResult)) {
                                 $selected = '';
                                 $currentParty = isset($_POST['party']) ? $_POST['party'] : (isset($Party) ? $Party : '');
-                                if (trim($currentParty) == trim($partyRow['Party_Type'])) {
+                                if (trim($currentParty) == trim($partyRow['Name'])) {
                                     $selected = 'selected';
                                 }
                                 ?>
-                                <option value="<?php echo $partyRow['Party_Type']; ?>" <?php echo $selected; ?>>
-                                    <?php echo $partyRow['Party_Type']; ?>
+                                <option value="<?php echo $partyRow['Name']; ?>" <?php echo $selected; ?>>
+                                    <?php echo $partyRow['Name']; ?>
                                 </option>
                                 <?php
                             }
@@ -712,8 +712,15 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                 amount = $('input[type="text"][name="amount"]').val();
             }
 
+            $('.table-error').text('');
+
             if (!product || product === 'Select' || !unit || !quantity || !rate || !amount) {
                 alert("Please select a product and fill all fields before adding to table");
+                return;
+            }
+
+            if (isProductDuplicate(product)) {
+                $('.table-error').text('This product is already added to the table');
                 return;
             }
 
@@ -737,6 +744,18 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                 }
             });
         });
+
+        function isProductDuplicate(productName) {
+            let isDuplicate = false;
+            $('#purchaseTableBody tr').each(function () {
+                let existingProduct = $(this).find('td:first-child').next().text().trim();
+                if (existingProduct.toLowerCase() === productName.toLowerCase()) {
+                    isDuplicate = true;
+                    return false;
+                }
+            });
+            return isDuplicate;
+        }
 
         $(document).on('click', '.deleteItem', function () {
             $(this).closest('tr').remove();

@@ -149,7 +149,7 @@ if (isset($stmt)) {
 
         form {
             padding: 50px 50px 50px 50px;
-            margin: 5%;
+            margin: 5% 30% 5% 30%;
             border-radius: 12px;
             background-color: white;
             color: black;
