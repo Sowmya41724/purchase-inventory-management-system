@@ -191,9 +191,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
             exit;
         }
     }
-} else {
-    // If not POST, use the pre-filled top values from edit (if any)
-    // These are already set above
 }
 
 function test_input($data)
@@ -688,11 +685,32 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
         });
 
         $('#addItem').on('click', function () {
-            var product = $('select[name="product"] option:selected').text().trim();
-            var unit = $('select[name="unit"]').val();
-            var quantity = $('input[name="quantity"]').val();
-            var rate = $('input[name="rate"]').val();
-            var amount = $('input[name="amount"]').val();
+            var product = "";
+            var unit = "";
+            var quantity = "";
+            var rate = "";
+            var amount = "";
+            var count = 0;
+
+            if ($('select[name="product"]').length > 0) {
+                product = $('select[name="product"] option:selected').text().trim();
+            }
+
+            if ($('select[name="unit"]').length > 0) {
+                unit = $('select[name="unit"]').val();
+            }
+
+            if ($('input[type="number"][name="quantity"]').length > 0) {
+                quantity = $('input[type="number"][name="quantity"]').val();
+            }
+
+            if ($('input[type="text"][name="rate"]').length > 0) {
+                rate = $('input[type="text"][name="rate"]').val();
+            }
+
+            if ($('input[type="text"][name="amount"]').length > 0) {
+                amount = $('input[type="text"][name="amount"]').val();
+            }
 
             if (!product || product === 'Select' || !unit || !quantity || !rate || !amount) {
                 alert("Please select a product and fill all fields before adding to table");
@@ -743,7 +761,6 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
 
         function clearInputs() {
             $('#Product').val('');
-            // Don't clear unit entirely; keep the selected unit? We'll reset to blank.
             $('#Unit').val('');
             $('#Quantity').val('');
             $('#rateHint').val('');
