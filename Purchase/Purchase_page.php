@@ -7,7 +7,6 @@ $Edit = 0;
 $DateErr = $PartyErr = $BillnoErr = $ProductErr = $UnitErr = $QuantityErr = $RateErr = $AmountErr = $tableError = "";
 $Date = $Party = $Billno = $Product = $Unit = $Quantity = $Rate = $Amount = $Total = "";
 
-// Variables for top input fields (for edit mode pre-fill)
 $topProduct = '';
 $topUnit = '';
 $topQuantity = '';
@@ -35,24 +34,12 @@ if (isset($_REQUEST['edit_id'])) {
     }
 }
 
-// For edit mode (initial load, not POST), populate the table rows and also set top input fields from first row
 if ($Edit == 1 && $_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_POST['productArray'] = array_map('trim', explode(',', $Product));
     $_POST['unitArray'] = array_map('trim', explode(',', $Unit));
     $_POST['quantityArray'] = array_map('trim', explode(',', $Quantity));
     $_POST['rateArray'] = array_map('trim', explode(',', $Rate));
     $_POST['amountArray'] = array_map('trim', explode(',', $Amount));
-
-    // Set top input fields from first row (if any)
-    if (!empty($_POST['productArray'])) {
-        // For product, we need the product ID, but we have product names. We'll leave product empty and let user select.
-        // Alternatively, we could try to find the product ID by name, but that's complex.
-        // For now, we'll only pre-fill unit, quantity, rate, amount from first row.
-        $topUnit = $_POST['unitArray'][0] ?? '';
-        $topQuantity = $_POST['quantityArray'][0] ?? '';
-        $topRate = $_POST['rateArray'][0] ?? '';
-        $topAmount = $_POST['amountArray'][0] ?? '';
-    }
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
@@ -224,7 +211,7 @@ if (isset($stmt)) {
 // Determine the current unit value for the top dropdown
 $currentUnitValue = '';
 if (isset($_POST['unit']) && !empty($_POST['unit'])) {
-    $currentUnitValue = $_POST['unit'];
+    $currentUnitValue = isset($_POST['unit']) ? $_POST['unit'] : '';
 } elseif (!empty($topUnit)) {
     $currentUnitValue = $topUnit;
 } else {
@@ -551,7 +538,7 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                 <div class="field-group">
                     <label for="Quantity">Quantity</label><br>
                     <input type="number" id="Quantity" name="quantity" oninput="Add()"
-                        value="<?php echo isset($_POST['quantity']) ? $_POST['quantity'] : (isset($topQuantity) ? $topQuantity : ''); ?>">
+                        value="<?php echo isset($_POST['quantity']) ? $_POST['quantity'] : ''; ?>">
                     <span class="error"><?php echo $QuantityErr; ?></span>
                 </div>
 
@@ -561,14 +548,14 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                     <div class="field-group">
                         <label for="rateHint">Rate</label><br>
                         <input type="text" id="rateHint" name="rate" readonly
-                            value="<?php echo isset($_POST['rate']) ? $_POST['rate'] : (isset($topRate) ? $topRate : ''); ?>">
+                            value="<?php echo isset($_POST['rate']) ? $_POST['rate'] : ''; ?>">
                         <span class="error"><?php echo $RateErr; ?></span>
                     </div>
                     <!-- Amount field -->
                     <div class="field-group">
                         <label for="Amount">Amount</label><br>
                         <input type="text" id="Amount" name="amount" readonly
-                            value="<?php echo isset($_POST['amount']) ? $_POST['amount'] : (isset($topAmount) ? $topAmount : ''); ?>">
+                            value="<?php echo isset($_POST['amount']) ? $_POST['amount'] : ''; ?>">
                         <span class="error"><?php echo $AmountErr; ?></span>
                     </div>
                     <!-- + button -->
