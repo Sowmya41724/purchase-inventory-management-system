@@ -7,7 +7,6 @@ $Edit = 0;
 $DateErr = $PartyErr = $BillnoErr = $ProductErr = $UnitErr = $QuantityErr = $RateErr = $AmountErr = $tableError = "";
 $Date = $Party = $Billno = $Product = $Unit = $Quantity = $Rate = $Amount = $Total = "";
 
-// Variables for top input fields (for edit mode pre-fill)
 $topProduct = '';
 $topUnit = '';
 $topQuantity = '';
@@ -35,24 +34,12 @@ if (isset($_REQUEST['edit_id'])) {
     }
 }
 
-// For edit mode (initial load, not POST), populate the table rows and also set top input fields from first row
 if ($Edit == 1 && $_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_POST['productArray'] = array_map('trim', explode(',', $Product));
     $_POST['unitArray'] = array_map('trim', explode(',', $Unit));
     $_POST['quantityArray'] = array_map('trim', explode(',', $Quantity));
     $_POST['rateArray'] = array_map('trim', explode(',', $Rate));
     $_POST['amountArray'] = array_map('trim', explode(',', $Amount));
-
-    // Set top input fields from first row (if any)
-    if (!empty($_POST['productArray'])) {
-        // For product, we need the product ID, but we have product names. We'll leave product empty and let user select.
-        // Alternatively, we could try to find the product ID by name, but that's complex.
-        // For now, we'll only pre-fill unit, quantity, rate, amount from first row.
-        $topUnit = $_POST['unitArray'][0] ?? '';
-        $topQuantity = $_POST['quantityArray'][0] ?? '';
-        $topRate = $_POST['rateArray'][0] ?? '';
-        $topAmount = $_POST['amountArray'][0] ?? '';
-    }
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
@@ -204,9 +191,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
             exit;
         }
     }
-} else {
-    // If not POST, use the pre-filled top values from edit (if any)
-    // These are already set above
 }
 
 function test_input($data)
@@ -701,11 +685,32 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
         });
 
         $('#addItem').on('click', function () {
-            var product = $('select[name="product"] option:selected').text().trim();
-            var unit = $('select[name="unit"]').val();
-            var quantity = $('input[name="quantity"]').val();
-            var rate = $('input[name="rate"]').val();
-            var amount = $('input[name="amount"]').val();
+            var product = "";
+            var unit = "";
+            var quantity = "";
+            var rate = "";
+            var amount = "";
+            var count = 0;
+
+            if ($('select[name="product"]').length > 0) {
+                product = $('select[name="product"] option:selected').text().trim();
+            }
+
+            if ($('select[name="unit"]').length > 0) {
+                unit = $('select[name="unit"]').val();
+            }
+
+            if ($('input[type="number"][name="quantity"]').length > 0) {
+                quantity = $('input[type="number"][name="quantity"]').val();
+            }
+
+            if ($('input[type="text"][name="rate"]').length > 0) {
+                rate = $('input[type="text"][name="rate"]').val();
+            }
+
+            if ($('input[type="text"][name="amount"]').length > 0) {
+                amount = $('input[type="text"][name="amount"]').val();
+            }
 
             if (!product || product === 'Select' || !unit || !quantity || !rate || !amount) {
                 alert("Please select a product and fill all fields before adding to table");
