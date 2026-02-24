@@ -4,7 +4,7 @@ include "../config.php";
 $edit_id = "";
 $Edit = 0;
 
-$DateErr = $PartyErr = $BillnoErr = $ProductErr = $UnitErr = $QuantityErr = $RateErr = $AmountErr = $tableError = "";
+$DateErr = $PartyErr = $BillnoErr = $ProductErr = $UnitErr = $QuantityErr = $RateErr = $AmountErr = $tableError = $qty_error = $rate_error = "";
 $Date = $Party = $Billno = $Product = $Unit = $Quantity = $Rate = $Amount = $Total = "";
 
 $topProduct = '';
@@ -98,7 +98,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         }
     }
 
-    // If no rows in table, validate the top input fields
     if (!$hasRows) {
         if (empty($_POST['product'])) {
             $ProductErr = "Product is required";
@@ -113,15 +112,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         if (empty($_POST['quantity'])) {
             $QuantityErr = "Quantity is required";
             $error = 1;
+        } else if ($_POST['quantity'] <= 0) {
+            $qty_error = "Quantity must be greater than 0";
+            $error = 1;
         }
 
         if (empty($_POST['rate'])) {
             $RateErr = "Rate is required";
             $error = 1;
+        } else if ($_POST['rate'] <= 0) {
+            $rate_error = "Rate must be greater than 0";
+            $error = 1;
         }
     }
 
-    // After validating all header fields, check for table rows only if no other errors
     if ($error == 0 && !$hasRows) {
         $tableError = "Please add at least one item to the table before submitting";
         $error = 1;
@@ -139,11 +143,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         $Total = test_input($_POST['total']);
     }
 
-    // For top input fields after POST, use POST values
     $topUnit = $_POST['unit'] ?? '';
     $topQuantity = $_POST['quantity'] ?? '';
     $topRate = $_POST['rate'] ?? '';
     $topAmount = $_POST['amount'] ?? '';
+
+    if ($error === 0 && $hasRows) {
+        $rowError = false;
+        for ($i = 0; $i < count($_POST['quantityArray']); $i++) {
+            $qty = floatval($_POST['quantityArray'][$i]);
+            $rate = floatval($_POST['rateArray'][$i]);
+
+            if ($qty <= 0) {
+                $rowError = true;
+                $qty_error = "All quantities must be greater than 0";
+                $error = 1;
+                break;
+            }
+            if ($rate <= 0) {
+                $rowError = true;
+                $rate_error = "All rates must be greater than 0";
+                $error = 1;
+                break;
+            }
+        }
+    }
 
     if ($error === 0) {
         if ($Edit == 0) {
@@ -225,192 +249,7 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="icon" type="image/x-icon"
         href="https://img.freepik.com/premium-vector/uoe-logo-design-initial-letter-uoe-monogram-logo-using-hexagon-shape_1101554-59452.jpg?semt=ais_hybrid&w=740&q=80">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRj4ImSMrTKEfFwSyFH80xtk2SZvGU_kb274Q&s");
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-size: cover;
-            font-family: Georgia, 'Times New Roman', Times, serif;
-        }
-
-        header {
-            background-color: #0a2463;
-            color: white;
-            padding: 50px;
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        .input-container {
-            padding: 50px 50px 50px 50px;
-            margin: 5%;
-            border-radius: 12px;
-            background-color: white;
-            color: black;
-        }
-
-        input[type="submit"] {
-            padding: 10px;
-            width: 100%;
-        }
-
-        .error {
-            color: red;
-            font-size: 0.85em;
-            display: block;
-            margin-top: 2px;
-        }
-
-        .table-error {
-            color: red;
-            font-weight: bold;
-            margin-left: 10px;
-            display: inline-block;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #0a2463;
-            color: white;
-            width: 100%;
-        }
-
-        input[type="text"],
-        input[type="date"],
-        input[type="number"] {
-            width: 100px;
-            height: 20px;
-        }
-
-        select {
-            width: 100px;
-            height: 25px;
-        }
-
-        footer {
-            background-color: #0a2463;
-            color: white;
-            padding: 30px;
-        }
-
-        button {
-            margin-bottom: 10px;
-            background-color: #0a2463;
-            color: white;
-            border: 1px;
-            cursor: pointer;
-            padding: 10px;
-        }
-
-        button:hover {
-            background-color: #DDD;
-            color: black;
-        }
-
-        a {
-            text-decoration: none;
-            color: white;
-        }
-
-        a:hover {
-            color: black;
-        }
-
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        th,
-        td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid #DDD;
-        }
-
-        td:hover {
-            background-color: #0a2463;
-            color: white;
-        }
-
-        td#no-hover:hover {
-            background-color: initial;
-        }
-
-        ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            background-color: white;
-            display: flex;
-            justify-content: center;
-        }
-
-        ul li a {
-            display: block;
-            color: black;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
-
-        ul li a:hover {
-            background-color: #0a2463;
-            color: white;
-        }
-
-        input[type="number"]#change {
-            border: none;
-            outline: none;
-            text-align: left;
-            font-family: Georgia, 'Times New Roman', Times, serif;
-        }
-
-        td:hover input[type="number"]#change {
-            background-color: #0a2463;
-            color: white;
-        }
-
-        input[type="number"].row-amount {
-            border: none;
-            outline: none;
-            text-align: left;
-            font-family: Georgia, 'Times New Roman', Times, serif;
-        }
-
-        td:hover input[type="number"].row-amount {
-            background-color: #0a2463;
-            color: white;
-        }
-
-        .field-group {
-            display: inline-block;
-            margin-right: 15px;
-            vertical-align: top;
-            text-align: left;
-        }
-
-        .rate-amount-button-wrapper {
-            display: inline-flex;
-            align-items: flex-start;
-            gap: 5px;
-        }
-
-        .rate-amount-button-wrapper .field-group {
-            margin-right: 0;
-        }
-
-        .rate-amount-button-wrapper button {
-            margin-top: 18px;
-            /* align with input fields */
-            height: 25px;
-            padding: 0 10px;
-            line-height: 25px;
-        }
-    </style>
+    <link rel="stylesheet" href="purchase_stylesheet.css">
     <script src="../js/jquery.min.js"></script>
 </head>
 
@@ -548,6 +387,7 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                             value="<?php echo isset($_POST['rate']) ? $_POST['rate'] : ''; ?>">
                         <span class="error"><?php echo $RateErr; ?></span>
                     </div>
+                    <span style="padding: 5px;"></span>
                     <!-- Amount field -->
                     <div class="field-group">
                         <label for="Amount">Amount</label><br>
@@ -555,6 +395,7 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                             value="<?php echo isset($_POST['amount']) ? $_POST['amount'] : ''; ?>">
                         <span class="error"><?php echo $AmountErr; ?></span>
                     </div>
+                    <span style="padding: 5px;"></span>
                     <!-- + button -->
                     <button type="button" id="addItem">+</button>
                 </div>
@@ -566,7 +407,6 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                 <br>
             </div>
 
-            <br><br>
             <table>
                 <thead>
                     <tr>
@@ -598,10 +438,12 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                                     <input type="number" class="edit-qty" value="<?php echo $_POST['quantityArray'][$i]; ?>">
                                     <input type="hidden" name="quantityArray[]"
                                         value="<?php echo $_POST['quantityArray'][$i]; ?>">
+                                    <span class="error"><?php echo $qty_error; ?></span>
                                 </td>
                                 <td>
                                     <input type="number" class="edit-rate" value="<?php echo $_POST['rateArray'][$i]; ?>">
                                     <input type="hidden" name="rateArray[]" value="<?php echo $_POST['rateArray'][$i]; ?>">
+                                    <span class="error"><?php echo $rate_error; ?></span>
                                 </td>
                                 <td>
                                     <input type="number" class="row-amount" value="<?php echo $_POST['amountArray'][$i]; ?>"
@@ -635,169 +477,14 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
         </form>
     </div>
 
-    <script>
-        function showUser(str) {
-            if (str == "") return;
-            var xmlhttp = new XMLHttpRequest();
-            xmlhttp.onreadystatechange = function () {
-                if (this.readyState == 4 && this.status == 200) {
-                    var parts = this.responseText.split("|");
-                    var unitValue = parts[0];
-                    var rateValue = parts[1];
+    <footer>
+        <p style="text-align: center;">
+            Copyright:
+            <?php echo date("Y"); ?>
+        </p>
+    </footer>
 
-                    document.getElementById("rateHint").value = rateValue;
-                    var selectElement = document.getElementById("Unit");
-                    if (selectElement) {
-                        // Check if the unitValue exists as an option
-                        var optionExists = false;
-                        for (var i = 0; i < selectElement.options.length; i++) {
-                            if (selectElement.options[i].value === unitValue) {
-                                optionExists = true;
-                                break;
-                            }
-                        }
-                        // If not, add it
-                        if (!optionExists && unitValue) {
-                            var opt = document.createElement("option");
-                            opt.value = unitValue;
-                            opt.text = unitValue;
-                            opt.selected = true;
-                            selectElement.appendChild(opt);
-                        } else {
-                            selectElement.value = unitValue;
-                        }
-                    }
-                    Add();
-                }
-            };
-            xmlhttp.open("GET", "value.php?q=" + str, true);
-            xmlhttp.send();
-        }
-
-        function Add() {
-            var qty = parseFloat(document.getElementById("Quantity").value) || 0;
-            var rate = parseFloat(document.getElementById("rateHint").value) || 0;
-            document.getElementById("Amount").value = (qty * rate).toFixed(2);
-        }
-
-        $(document).ready(function () {
-            calculateTotal();
-        });
-
-        $('#addItem').on('click', function () {
-            var product = "";
-            var unit = "";
-            var quantity = "";
-            var rate = "";
-            var amount = "";
-            var count = 0;
-
-            if ($('select[name="product"]').length > 0) {
-                product = $('select[name="product"] option:selected').text().trim();
-            }
-
-            if ($('select[name="unit"]').length > 0) {
-                unit = $('select[name="unit"]').val();
-            }
-
-            if ($('input[type="number"][name="quantity"]').length > 0) {
-                quantity = $('input[type="number"][name="quantity"]').val();
-            }
-
-            if ($('input[type="text"][name="rate"]').length > 0) {
-                rate = $('input[type="text"][name="rate"]').val();
-            }
-
-            if ($('input[type="text"][name="amount"]').length > 0) {
-                amount = $('input[type="text"][name="amount"]').val();
-            }
-
-            $('.table-error').text('');
-
-            if (!product || product === 'Select' || !unit || !quantity || !rate || !amount) {
-                alert("Please select a product and fill all fields before adding to table");
-                return;
-            }
-
-            if (isProductDuplicate(product)) {
-                $('.table-error').text('This product is already added to the table');
-                return;
-            }
-
-            var post_url = "table.php?selected_product=" + encodeURIComponent(product) +
-                "&selected_unit=" + encodeURIComponent(unit) +
-                "&selected_qty=" + encodeURIComponent(quantity) +
-                "&selected_rate=" + encodeURIComponent(rate) +
-                "&selected_amount=" + encodeURIComponent(amount);
-
-            $.ajax({
-                url: post_url, type: 'GET', cache: false,
-                success: function (result) {
-                    $('#purchaseTableBody').append(result);
-                    renumberRows();
-                    calculateTotal();
-                    clearInputs();
-                    $('.table-error').text('');
-                },
-                error: function (xhr, status, error) {
-                    console.error(status, error);
-                }
-            });
-        });
-
-        function isProductDuplicate(productName) {
-            let isDuplicate = false;
-            $('#purchaseTableBody tr').each(function () {
-                let existingProduct = $(this).find('td:first-child').next().text().trim();
-                if (existingProduct.toLowerCase() === productName.toLowerCase()) {
-                    isDuplicate = true;
-                    return false;
-                }
-            });
-            return isDuplicate;
-        }
-
-        $(document).on('click', '.deleteItem', function () {
-            $(this).closest('tr').remove();
-            renumberRows();
-            calculateTotal();
-        });
-
-        function renumberRows() {
-            $('#purchaseTableBody tr').each(function (index) {
-                $(this).find('.row-id').text(index + 1);
-            });
-        }
-
-        function calculateTotal() {
-            let total = 0;
-            $('#purchaseTableBody tr').each(function () {
-                let amt = $(this).find('.row-amount').val();
-                total += parseFloat(amt) || 0;
-            });
-            $('.grand_total').val(total.toFixed(2));
-        }
-
-        function clearInputs() {
-            $('#Product').val('');
-            $('#Unit').val('');
-            $('#Quantity').val('');
-            $('#rateHint').val('');
-            $('#Amount').val('');
-        }
-
-        $(document).on('input', '.edit-qty, .edit-rate', function () {
-            let row = $(this).closest('tr');
-            let qty = parseFloat(row.find('.edit-qty').val()) || 0;
-            let rate = parseFloat(row.find('.edit-rate').val()) || 0;
-            let amount = (qty * rate).toFixed(2);
-            row.find('.row-amount').val(amount);
-            row.find('input[name="quantityArray[]"]').val(qty);
-            row.find('input[name="rateArray[]"]').val(rate);
-            row.find('input[name="amountArray[]"]').val(amount);
-            calculateTotal();
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 
 </html>

@@ -104,6 +104,27 @@ if (isset($_REQUEST['delete_id'])) {
         a:hover {
             color: white;
         }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+        }
+
+        ul li a {
+            display: block;
+            color: black;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        ul li a:hover {
+            background-color: #0a2463;
+            color: white;
+        }
     </style>
 </head>
 
@@ -111,6 +132,14 @@ if (isset($_REQUEST['delete_id'])) {
     <header>
         <h1>Edit Unit Table</h1>
     </header>
+    <nav style="text-align: center;">
+        <ul>
+            <li><a href="../Purchase/Purchase_page.php">Purchase</a></li>
+            <li><a href="../Product/Product_table.php">Product</a></li>
+            <li><a href="../Party/Party_Page.php">Party</a></li>
+        </ul>
+    </nav>
+
     <div class="input-container">
         <button onclick="location.href='Unit_table.php'" Type="button">&#8617; Back to form</button>
         <table>
