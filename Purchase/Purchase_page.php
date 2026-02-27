@@ -249,7 +249,7 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="icon" type="image/x-icon"
         href="https://img.freepik.com/premium-vector/uoe-logo-design-initial-letter-uoe-monogram-logo-using-hexagon-shape_1101554-59452.jpg?semt=ais_hybrid&w=740&q=80">
-    <link rel="stylesheet" href="purchase_stylesheet.css">
+    <link rel="stylesheet" href="Stylesheet/purchase_stylesheet.css">
     <script src="../js/jquery.min.js"></script>
 </head>
 
@@ -262,6 +262,7 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
             <li><a href="../Unit/Unit_table.php">Unit</a></li>
             <li><a href="../Product/Product_table.php">Product</a></li>
             <li><a href="../Party/Party_Page.php">Party</a></li>
+            <li><a href="../Sales/sales_page.php">Sales</a></li>
         </ul>
     </nav>
 

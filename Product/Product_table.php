@@ -126,110 +126,7 @@ if (isset($stmt)) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="icon" type="image/x-icon"
         href="https://img.freepik.com/premium-vector/uoe-logo-design-initial-letter-uoe-monogram-logo-using-hexagon-shape_1101554-59452.jpg?semt=ais_hybrid&w=740&q=80">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRj4ImSMrTKEfFwSyFH80xtk2SZvGU_kb274Q&s");
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-size: cover;
-            font-family: Georgia, 'Times New Roman', Times, serif;
-        }
-
-        header {
-            background-color: #0a2463;
-            color: white;
-            padding: 50px;
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        form {
-            padding: 50px 50px 50px 50px;
-            margin: 5% 30% 5% 30%;
-            border-radius: 12px;
-            background-color: white;
-            color: black;
-        }
-
-        input {
-            padding: 10px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        select,
-        input[type="submit"] {
-            padding: 10px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-
-        .error {
-            color: red;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #0a2463;
-            color: white;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        footer {
-            background-color: #0a2463;
-            color: white;
-            padding: 30px;
-        }
-
-        button {
-            margin-bottom: 10px;
-            background-color: #DDD;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            text-decoration: underline;
-            background-color: #0a2463;
-            color: white;
-        }
-
-        a {
-            text-decoration: none;
-            color: black;
-        }
-
-        a:hover {
-            color: white;
-        }
-
-        ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-            background-color: white;
-            display: flex;
-            justify-content: center;
-        }
-
-        ul li a {
-            display: block;
-            color: black;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
-
-        ul li a:hover {
-            background-color: #0a2463;
-            color: white;
-        }
-    </style>
+    <link rel="stylesheet" href="Stylesheet/product_styles.css">
 </head>
 
 <body>
@@ -241,14 +138,13 @@ if (isset($stmt)) {
             <li><a href="../Unit/Unit_table.php">Unit</a></li>
             <li><a href="../Purchase/Purchase_page.php">Purchase</a></li>
             <li><a href="../Party/Party_Page.php">Party</a></li>
+            <li><a href="../Sales/sales_page.php">Sales</a></li>
         </ul>
     </nav>
 
     <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
-        <button>
-            <a href="edit_product.php">
-                &#8618; Database
-            </a>
+        <button onclick="location.href='edit_product.php'" Type="button">
+            &#8618; Database
         </button>
         <h1>Fill the details:</h1>
         <input type="hidden" name="edit_id" value="<?php echo $edit_id; ?>">
