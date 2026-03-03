@@ -17,13 +17,13 @@ if (isset($_REQUEST['edit_id'])) {
 
     if (!empty($result)) {
         foreach ($result as $data) {
-            $Name = $data['Name'];
-            $Mobileno = $data['Mobileno'];
-            $Address = $data['Address'];
-            $City = $data['City'];
-            $Pincode = $data['Pincode'];
-            $Email = $data['Email'];
-            $Party_type = $data['Party_Type'];
+            $Name = $data['name'];
+            $Mobileno = $data['mobile_no'];
+            $Address = $data['address'];
+            $City = $data['city'];
+            $Pincode = $data['pincode'];
+            $Email = $data['email'];
+            $Party_type = $data['party_type'];
         }
     }
 }
@@ -45,12 +45,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             if ($Edit == 0) {
                 // checking
-                $sql = "SELECT id FROM Party WHERE Name = ?";
+                $sql = "SELECT id FROM Party WHERE `name` = ?";
                 $result = $conn->execute_query($sql, [$Name]);
 
             } else {
                 // ignore if edit
-                $sql = "SELECT id FROM Party WHERE Name = ? AND id != ?";
+                $sql = "SELECT id FROM Party WHERE `name` = ? AND id != ?";
                 $result = $conn->execute_query($sql, [$Name, $edit_id]);
             }
 
@@ -72,10 +72,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = 1;
         } else {
             if ($Edit == 0) {
-                $sql = "SELECT id FROM Party WHERE Mobileno = ?";
+                $sql = "SELECT id FROM Party WHERE mobile_no = ?";
                 $result = $conn->execute_query($sql, [$Mobileno]);
             } else {
-                $sql = "SELECT id FROM Party WHERE Mobileno = ? AND id != ?";
+                $sql = "SELECT id FROM Party WHERE mobile_no = ? AND id != ?";
                 $result = $conn->execute_query($sql, [$Mobileno, $edit_id]);
             }
 
@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $Address = test_input($_POST["address"]);
         if ($Edit == 0) {
             // ignore if edit
-            $sql = "SELECT id FROM Party WHERE Address = ? AND id != ?";
+            $sql = "SELECT id FROM Party WHERE `address` = ? AND id != ?";
             $result = $conn->execute_query($sql, [$Address, $edit_id]);
         }
     }
@@ -104,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $City = test_input($_POST["city"]);
 
         if ($Edit == 0) {
-            $sql = "SELECT id FROM Party WHERE City = ? AND id != ?";
+            $sql = "SELECT id FROM Party WHERE city = ? AND id != ?";
             $result = $conn->execute_query($sql, [$City, $edit_id]);
         }
     }
@@ -115,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $Pincode = test_input($_POST["pincode"]);
 
         if ($Edit == 0) {
-            $sql = "SELECT id FROM Party WHERE Pincode = ? AND id != ?";
+            $sql = "SELECT id FROM Party WHERE pincode = ? AND id != ?";
             $result = $conn->execute_query($sql, [$Pincode, $edit_id]);
         }
     }
@@ -130,10 +130,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = 1;
         } else {
             if ($Edit == 0) {
-                $sql = "SELECT id FROM Party WHERE Email = ?";
+                $sql = "SELECT id FROM Party WHERE email = ?";
                 $result = $conn->execute_query($sql, [$Email]);
             } else {
-                $sql = "SELECT id FROM Party WHERE Email = ? AND id != ?";
+                $sql = "SELECT id FROM Party WHERE email = ? AND id != ?";
                 $result = $conn->execute_query($sql, [$Email, $edit_id]);
             }
 
@@ -151,14 +151,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $Party_type = test_input($_POST["party"]);
         if ($Edit == 0) {
             // ignore if edit
-            $sql = "SELECT id FROM Party WHERE Party_Type = ? AND id != ?";
+            $sql = "SELECT id FROM Party WHERE party_type = ? AND id != ?";
             $result = $conn->execute_query($sql, [$Party_type, $edit_id]);
         }
     }
 
     if ($error === 0) {
         if ($Edit == 0) {
-            $sql = "INSERT INTO Party (Name, Mobileno, Address, City, Pincode, Email, Party_Type) VALUES (?,?,?,?,?,?,?)";
+            $sql = "INSERT INTO Party (`name`, mobile_no, `address`, city, pincode, email, party_type) VALUES (?,?,?,?,?,?,?)";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("sssssss", $Name, $Mobileno, $Address, $City, $Pincode, $Email, $Party_type);
 
@@ -166,7 +166,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: edit_party.php?success=1");
             exit;
         } else {
-            $sql = "UPDATE Party  SET Name=?, Mobileno=?, Address=?, City=?, Pincode=?, Email=?, Party_Type=? WHERE id=?";
+            $sql = "UPDATE Party  SET `name`=?, mobile_no=?, `address`=?, city=?, pincode=?, email=?, party_type=? WHERE id=?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("sssssssi", $Name, $Mobileno, $Address, $City, $Pincode, $Email, $Party_type, $edit_id);
 

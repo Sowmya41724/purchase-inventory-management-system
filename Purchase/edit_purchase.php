@@ -77,31 +77,31 @@ if (isset($_REQUEST['delete_id'])) {
                             <?php echo $m; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Date']; ?>
+                            <?php echo $rows['date']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Party_Type']; ?>
+                            <?php echo $rows['party_type']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['BillNo']; ?>
+                            <?php echo $rows['bill_no']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Product']; ?>
+                            <?php echo $rows['product']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Unit']; ?>
+                            <?php echo $rows['unit']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Quantity']; ?>
+                            <?php echo $rows['quantity']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Rate']; ?>
+                            <?php echo $rows['rate']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Amount']; ?>
+                            <?php echo $rows['amount']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Total']; ?>
+                            <?php echo $rows['total']; ?>
                         </td>
                         <td id="no-hover">
                             <button onclick="location.href='Purchase_page.php?edit_id=<?php echo $rows['id']; ?>'" name="edit"

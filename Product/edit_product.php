@@ -64,9 +64,9 @@ if (isset($_REQUEST['delete_id'])) {
                     ?>
                     <tr>
                         <td><?php echo $m; ?></td>
-                        <td><?php echo $rows['Name']; ?></td>
-                        <td><?php echo $rows['unitValue']; ?></td>
-                        <td><?php echo $rows['Rate']; ?></td>
+                        <td><?php echo $rows['product_name']; ?></td>
+                        <td><?php echo $rows['unit_name']; ?></td>
+                        <td><?php echo $rows['rate']; ?></td>
                         <td id="no-hover">
                             <button onclick="location.href='Product_table.php?edit_id=<?php echo $rows['id']; ?>'" name="edit"
                                 type="submit">

@@ -63,7 +63,7 @@ if (isset($_REQUEST['delete_id'])) {
                     ?>
                     <tr>
                         <td><?php echo $m; ?></td>
-                        <td><?php echo $rows['name']; ?></td>
+                        <td><?php echo $rows['unit_name']; ?></td>
                         <td id="no-hover">
                             <button onclick="location.href='Unit_table.php?edit_id=<?php echo $rows['id']; ?>'" name="edit"
                                 type="submit">

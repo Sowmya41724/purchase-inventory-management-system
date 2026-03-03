@@ -71,25 +71,25 @@ if (isset($_REQUEST['delete_id'])) {
                             <?php echo $m; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Name']; ?>
+                            <?php echo $rows['name']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Mobileno']; ?>
+                            <?php echo $rows['mobile_no']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Address']; ?>
+                            <?php echo $rows['address']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['City']; ?>
+                            <?php echo $rows['city']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Pincode']; ?>
+                            <?php echo $rows['pincode']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Email']; ?>
+                            <?php echo $rows['email']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['Party_Type']; ?>
+                            <?php echo $rows['party_type']; ?>
                         </td>
                         <td id="no-hover">
                             <button onclick="location.href='Party_Page.php?edit_id=<?php echo $rows['id']; ?>'" name="edit"

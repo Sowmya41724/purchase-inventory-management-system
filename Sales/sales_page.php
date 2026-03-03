@@ -22,15 +22,15 @@ if (isset($_REQUEST['edit_id'])) {
 
     if (mysqli_num_rows($result) > 0) {
         $data = mysqli_fetch_assoc($result);
-        $Date = $data['Date'];
-        $Billno = $data['BillNo'];
-        $Party = $data['Party_Type'];
-        $Product = $data['Product'];
-        $Unit = $data['Unit'];
-        $Quantity = $data['Quantity'];
-        $Rate = $data['Rate'];
-        $Amount = $data['Amount'];
-        $Total = $data['Total'];
+        $Date = $data['date'];
+        $Billno = $data['bill_no'];
+        $Party = $data['party_type'];
+        $Product = $data['product'];
+        $Unit = $data['unit'];
+        $Quantity = $data['quantity'];
+        $Rate = $data['rate'];
+        $Amount = $data['amount'];
+        $Total = $data['total'];
     }
 }
 
@@ -48,6 +48,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     $error = 0;
     $edit_id = $_POST['edit_id'] ?? 0;
     $Edit = ($edit_id > 0) ? 1 : 0;
+
+    $Billno = $_POST['billno'] ?? '';
 
     // Validate date
     if (empty($_POST['date'])) {
@@ -70,32 +72,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     }
 
     // Validate bill number
-    if (empty($_POST['billno'])) {
+    if (empty($Billno)) {
         $BillnoErr = "Bill number is required";
         $error = 1;
     } else {
-        $Billno = test_input($_POST['billno']);
-        if (!preg_match("/^[0-9]*$/", $Billno)) {
-            $BillnoErr = "Only numbers are allowed";
-            $error = 1;
+        if ($Edit == 0) {
+            $checkBill = $conn->prepare("SELECT id FROM sales WHERE bill_no = ?");
+            $checkBill->bind_param("s", $Billno);
         } else {
-            if ($Edit == 1) {
-                $checkBill = mysqli_query(
-                    $conn,
-                    "SELECT id FROM sales WHERE BillNo = '$Billno' AND id != '$edit_id'"
-                );
-            } else {
-                $checkBill = mysqli_query(
-                    $conn,
-                    "SELECT id FROM sales WHERE BillNo = '$Billno'"
-                );
-            }
-
-            if (mysqli_num_rows($checkBill) > 0) {
-                $BillnoErr = "Bill number already exists";
-                $error = 1;
-            }
+            $checkBill = $conn->prepare("SELECT id FROM sales WHERE bill_no = ? AND id != ?");
+            $checkBill->bind_param("si", $Billno, $edit_id);
         }
+        $checkBill->execute();
+        $duplicate = $checkBill->get_result();
+        if ($duplicate->num_rows > 0) {
+            $BillnoErr = "Bill number already exists";
+            $error = 1;
+        }
+        $checkBill->close();
     }
 
     if (!$hasRows) {
@@ -172,12 +166,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     if ($error === 0) {
         if ($Edit == 0) {
             $sql = "INSERT INTO sales 
-            (Date, BillNo, Party_Type, Product, Unit, Quantity, Rate, Amount, Total) 
+            (`date`, bill_no, party_type, product, unit, quantity, rate, amount, total) 
             VALUES (?,?,?,?,?,?,?,?,?)";
 
             $stmt = $conn->prepare($sql);
             $stmt->bind_param(
-                "sisssssss",
+                "sssssssss",
                 $Date,
                 $Billno,
                 $Party,
@@ -193,11 +187,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
             header("Location: edit_sales.php?success=1");
             exit;
         } else {
-            $sql = "UPDATE sales SET Date=?, BillNo=?, Party_Type=?, Product=?, Unit=?, Quantity=?, Rate=?, Amount=?, Total=? WHERE id=?";
+            $sql = "UPDATE sales SET `date`=?, bill_no=?, party_type=?, product=?, unit=?, quantity=?, rate=?, amount=?, total=? WHERE id=?";
 
             $stmt = $conn->prepare($sql);
             $stmt->bind_param(
-                "sisssssssi",
+                "sssssssssi",
                 $Date,
                 $Billno,
                 $Party,
@@ -215,6 +209,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
             exit;
         }
     }
+}
+
+if ($Edit == 0 && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    $month_year = date("my");
+    $sql = "SELECT bill_no FROM sales WHERE bill_no LIKE 'B-$month_year-%' ORDER BY bill_no DESC LIMIT 1";
+    $result = $conn->query($sql);
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $last_no = intval(substr($row['bill_no'], -4)) + 1;
+    } else {
+        $last_no = 1;
+    }
+    $Billno = "B-$month_year-" . str_pad($last_no, 4, '0', STR_PAD_LEFT);
 }
 
 function test_input($data)
@@ -286,18 +293,18 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                     <select id="Party" name="party">
                         <option value="">Select</option>
                         <?php
-                        $partySQL = "SELECT `Name` FROM Party WHERE Party_Type ='sales'";
+                        $partySQL = "SELECT `name` FROM Party WHERE party_type ='sales'";
                         $partyResult = mysqli_query($conn, $partySQL);
                         if (mysqli_num_rows($partyResult) > 0) {
                             while ($partyRow = mysqli_fetch_assoc($partyResult)) {
                                 $selected = '';
                                 $currentParty = isset($_POST['party']) ? $_POST['party'] : (isset($Party) ? $Party : '');
-                                if (trim($currentParty) == trim($partyRow['Name'])) {
+                                if (trim($currentParty) == trim($partyRow['name'])) {
                                     $selected = 'selected';
                                 }
                                 ?>
-                                <option value="<?php echo $partyRow['Name']; ?>" <?php echo $selected; ?>>
-                                    <?php echo $partyRow['Name']; ?>
+                                <option value="<?php echo $partyRow['name']; ?>" <?php echo $selected; ?>>
+                                    <?php echo $partyRow['name']; ?>
                                 </option>
                                 <?php
                             }
@@ -312,8 +319,8 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                 <!-- Bill number field -->
                 <div class="field-group">
                     <label for="Billno">Bill no</label><br>
-                    <input type="text" name="billno" id="Billno" inputmode="numeric" pattern="[0-9]*" maxlength="4"
-                        value="<?php echo isset($_POST['billno']) ? $_POST['billno'] : (isset($Billno) ? $Billno : ''); ?>">
+                    <input type="text" name="billno" id="Billno" value="<?php echo htmlspecialchars($Billno); ?>"
+                        readonly class="custom-input">
                     <span class="error">
                         <?php echo $BillnoErr; ?>
                     </span>
@@ -327,7 +334,7 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                     <select id="Product" name="product" onchange="showUser(this.value)">
                         <option value="">Select</option>
                         <?php
-                        $prodSQL = "SELECT `Name`, id FROM Product";
+                        $prodSQL = "SELECT product_name, id FROM Product";
                         $prodResult = mysqli_query($conn, $prodSQL);
                         if (mysqli_num_rows($prodResult) > 0) {
                             while ($prodRow = mysqli_fetch_assoc($prodResult)) {
@@ -338,7 +345,7 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                                 }
                                 ?>
                                 <option value="<?php echo $prodRow['id']; ?>" <?php echo $selected; ?>>
-                                    <?php echo $prodRow['Name']; ?>
+                                    <?php echo $prodRow['product_name']; ?>
                                 </option>
                                 <?php
                             }
@@ -357,12 +364,12 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                         <option value="">Select</option>
                         <?php
                         // Get all units from Unit table
-                        $unitSQL = "SELECT unitValue FROM Product";
+                        $unitSQL = "SELECT unit_name FROM Product";
                         $unitResult = mysqli_query($conn, $unitSQL);
                         $unitOptions = array();
                         if (mysqli_num_rows($unitResult) > 0) {
                             while ($unitRow = mysqli_fetch_assoc($unitResult)) {
-                                $unitOptions[] = $unitRow['unitValue'];
+                                $unitOptions[] = $unitRow['unit_name'];
                             }
                         }
                         // If the current unit value is not in the options, add it so it can be selected
@@ -509,6 +516,8 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
             <?php echo date("Y"); ?>
         </p>
     </footer>
+
+    <script src="sales_script.js"></script>
 
 </body>
 

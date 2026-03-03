@@ -17,7 +17,7 @@ if (isset($_REQUEST['edit_id'])) {
 
     if (!empty($result)) {
         foreach ($result as $data) {
-            $unitName = $data['name'];
+            $unitName = $data['unit_name'];
         }
     }
 }
@@ -39,12 +39,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             if ($Edit == 0) {
                 // checking
-                $sql = "SELECT id FROM Unit WHERE name = ?";
+                $sql = "SELECT id FROM Unit WHERE unit_name = ?";
                 $result = $conn->execute_query($sql, [$unitName]);
 
             } else {
                 // ignore if edit
-                $sql = "SELECT id FROM Unit WHERE name = ? AND id != ?";
+                $sql = "SELECT id FROM Unit WHERE unit_name = ? AND id != ?";
                 $result = $conn->execute_query($sql, [$unitName, $edit_id]);
             }
 
@@ -57,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (!$hasError) {
         if ($Edit == 0) {
-            $sql = "INSERT INTO Unit (name) VALUES (?)";
+            $sql = "INSERT INTO Unit (unit_name) VALUES (?)";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("s", $unitName);
 
@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: edit_unit.php?success=1");
             exit;
         } else {
-            $sql = "UPDATE Unit  SET name=? WHERE id=?";
+            $sql = "UPDATE Unit  SET unit_name=? WHERE id=?";
 
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("si", $unitName, $edit_id);

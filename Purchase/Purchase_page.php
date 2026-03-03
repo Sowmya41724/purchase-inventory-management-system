@@ -22,15 +22,15 @@ if (isset($_REQUEST['edit_id'])) {
 
     if (mysqli_num_rows($result) > 0) {
         $data = mysqli_fetch_assoc($result);
-        $Date = $data['Date'];
-        $Billno = $data['BillNo'];
-        $Party = $data['Party_Type'];
-        $Product = $data['Product'];
-        $Unit = $data['Unit'];
-        $Quantity = $data['Quantity'];
-        $Rate = $data['Rate'];
-        $Amount = $data['Amount'];
-        $Total = $data['Total'];
+        $Date = $data['date'];
+        $Billno = $data['bill_no'];
+        $Party = $data['party_type'];
+        $Product = $data['product'];
+        $Unit = $data['unit'];
+        $Quantity = $data['quantity'];
+        $Rate = $data['rate'];
+        $Amount = $data['amount'];
+        $Total = $data['total'];
     }
 }
 
@@ -82,12 +82,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
             if ($Edit == 1) {
                 $checkBill = mysqli_query(
                     $conn,
-                    "SELECT id FROM purchase WHERE BillNo = '$Billno' AND id != '$edit_id'"
+                    "SELECT id FROM purchase WHERE bill_no = '$Billno' AND id != '$edit_id'"
                 );
             } else {
                 $checkBill = mysqli_query(
                     $conn,
-                    "SELECT id FROM purchase WHERE BillNo = '$Billno'"
+                    "SELECT id FROM purchase WHERE bill_no = '$Billno'"
                 );
             }
 
@@ -172,7 +172,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     if ($error === 0) {
         if ($Edit == 0) {
             $sql = "INSERT INTO Purchase 
-            (Date, BillNo, Party_Type, Product, Unit, Quantity, Rate, Amount, Total) 
+            (`date`, bill_no, party_type, product, unit, quantity, rate, amount, total) 
             VALUES (?,?,?,?,?,?,?,?,?)";
 
             $stmt = $conn->prepare($sql);
@@ -193,7 +193,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
             header("Location: edit_purchase.php?success=1");
             exit;
         } else {
-            $sql = "UPDATE Purchase SET Date=?, BillNo=?, Party_Type=?, Product=?, Unit=?, Quantity=?, Rate=?, Amount=?, Total=? WHERE id=?";
+            $sql = "UPDATE Purchase SET `date`=?, bill_no=?, party_type=?, product=?, unit=?, quantity=?, rate=?, amount=?, total=? WHERE id=?";
 
             $stmt = $conn->prepare($sql);
             $stmt->bind_param(
@@ -285,18 +285,18 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                     <select id="Party" name="party">
                         <option value="">Select</option>
                         <?php
-                        $partySQL = "SELECT `Name` FROM Party WHERE Party_Type IN ('Purchase', 'Both')";
+                        $partySQL = "SELECT `name` FROM Party WHERE party_type IN ('Purchase', 'Both')";
                         $partyResult = mysqli_query($conn, $partySQL);
                         if (mysqli_num_rows($partyResult) > 0) {
                             while ($partyRow = mysqli_fetch_assoc($partyResult)) {
                                 $selected = '';
                                 $currentParty = isset($_POST['party']) ? $_POST['party'] : (isset($Party) ? $Party : '');
-                                if (trim($currentParty) == trim($partyRow['Name'])) {
+                                if (trim($currentParty) == trim($partyRow['name'])) {
                                     $selected = 'selected';
                                 }
                                 ?>
-                                <option value="<?php echo $partyRow['Name']; ?>" <?php echo $selected; ?>>
-                                    <?php echo $partyRow['Name']; ?>
+                                <option value="<?php echo $partyRow['name']; ?>" <?php echo $selected; ?>>
+                                    <?php echo $partyRow['name']; ?>
                                 </option>
                                 <?php
                             }
@@ -322,7 +322,7 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                     <select id="Product" name="product" onchange="showUser(this.value)">
                         <option value="">Select</option>
                         <?php
-                        $prodSQL = "SELECT `Name`, id FROM Product";
+                        $prodSQL = "SELECT product_name, id FROM Product";
                         $prodResult = mysqli_query($conn, $prodSQL);
                         if (mysqli_num_rows($prodResult) > 0) {
                             while ($prodRow = mysqli_fetch_assoc($prodResult)) {
@@ -333,7 +333,7 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                                 }
                                 ?>
                                 <option value="<?php echo $prodRow['id']; ?>" <?php echo $selected; ?>>
-                                    <?php echo $prodRow['Name']; ?>
+                                    <?php echo $prodRow['product_name']; ?>
                                 </option>
                                 <?php
                             }
@@ -350,12 +350,12 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
                         <option value="">Select</option>
                         <?php
                         // Get all units from Unit table
-                        $unitSQL = "SELECT unitValue FROM Product";
+                        $unitSQL = "SELECT unit_name FROM Product";
                         $unitResult = mysqli_query($conn, $unitSQL);
                         $unitOptions = array();
                         if (mysqli_num_rows($unitResult) > 0) {
                             while ($unitRow = mysqli_fetch_assoc($unitResult)) {
-                                $unitOptions[] = $unitRow['unitValue'];
+                                $unitOptions[] = $unitRow['unit_name'];
                             }
                         }
                         // If the current unit value is not in the options, add it so it can be selected
