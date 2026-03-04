@@ -41,9 +41,9 @@ if (isset($_REQUEST['delete_id'])) {
     </header>
     <nav style="text-align: center;">
         <ul>
-            <li><a href="../Unit_table.php">Unit</a></li>
-            <li><a href="../Product_table.php">Product</a></li>
-            <li><a href="../Party_Page.php">Party</a></li>
+            <li><a href="../Unit/Unit_table.php">Unit</a></li>
+            <li><a href="../Product/Product_table.php">Product</a></li>
+            <li><a href="../Party/Party_Page.php">Party</a></li>
             <li><a href="../Sales/sales_page.php">Sales</a></li>
         </ul>
     </nav>
@@ -105,7 +105,7 @@ if (isset($_REQUEST['delete_id'])) {
                         </td>
                         <td id="no-hover">
                             <button onclick="location.href='Purchase_page.php?edit_id=<?php echo $rows['id']; ?>'" name="edit"
-                                type="submit">
+                                type="submit" style="padding: 10px 15px 10px 15px;">
                                 &#x1F589;Edit
                             </button>
                             <br>

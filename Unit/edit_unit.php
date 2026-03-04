@@ -66,7 +66,7 @@ if (isset($_REQUEST['delete_id'])) {
                         <td><?php echo $rows['unit_name']; ?></td>
                         <td id="no-hover">
                             <button onclick="location.href='Unit_table.php?edit_id=<?php echo $rows['id']; ?>'" name="edit"
-                                type="submit">
+                                type="submit" style="padding: 10px 15px 10px 15px;">
                                 &#x1F589;Edit
                             </button>
                             <br>

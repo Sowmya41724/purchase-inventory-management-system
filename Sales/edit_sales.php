@@ -104,7 +104,7 @@ if (isset($_REQUEST['delete_id'])) {
                         </td>
                         <td id="no-hover">
                             <button onclick="location.href='sales_page.php?edit_id=<?php echo $rows['id']; ?>'" name="edit"
-                                type="submit">
+                                type="submit" style="padding: 10px 15px 10px 15px;">
                                 &#x1F589;Edit
                             </button>
                             <br>

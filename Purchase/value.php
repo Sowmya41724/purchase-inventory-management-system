@@ -3,17 +3,23 @@ $q = isset($_GET['q']) ? intval($_GET['q']) : 0;
 
 include "../config.php";
 
-$sql = "SELECT unit_name, rate FROM Product WHERE id = ?";
-$stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "i", $q);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
+if (isset($_GET['q']) && is_numeric($_GET['q'])) {
+    $id = intval($_GET['q']);
 
-if ($row = mysqli_fetch_assoc($result)) {
+    $stmt = $conn->prepare("SELECT unit_name, rate FROM Product WHERE id = ?");
+    $stmt->bind_param("i", $q);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    echo trim($row['unit_name']) . "|" . trim($row['rate']);
-    ;
+    if ($row = $result->fetch_assoc()) {
+        echo $row['unit_name'] . "|" . $row['rate'];
+    } else {
+        echo "|";
+    }
+
+    $stmt->close();
+} else {
+    echo "|";
 }
 
-mysqli_close($conn);
 ?>

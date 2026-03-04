@@ -184,6 +184,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
             );
 
             $stmt->execute();
+
+            $inward = 0;
+            $action = 'Minus';
+            $type = 'Sales';
+            $remarks = 'Sales bill: ' . $Billno;
+
+            for ($i = 0; $i < count($_POST['productArray']); $i++) {
+                $prodName = $_POST['productArray'][$i];
+                $unitName = $_POST['unitArray'][$i];
+                $qty = $_POST['quantityArray'][$i];
+
+                $sql2 = "INSERT INTO stock (product_name, unit_name, inward_unit, outward_unit, stock_action, stock_type, remarks) VALUES (?,?,?,?,?,?,?)";
+                $stmt2 = $conn->prepare($sql2);
+                $stmt2->bind_param("ssiisss", $prodName, $unitName, $inward, $qty, $action, $type, $remarks);
+                $stmt2->execute();
+                $stmt2->close();
+            }
             header("Location: edit_sales.php?success=1");
             exit;
         } else {
@@ -205,6 +222,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
             );
 
             $stmt->execute();
+
+            $delete_sql = "DELETE FROM stock WHERE remarks = ? AND stock_type = 'Purchase'";
+            $delete_stmt = $conn->prepare($delete_sql);
+            $delete_stmt->bind_param("i", $edit_id);
+            $delete_stmt->execute();
+            $delete_stmt->close();
+
+            $inward = 0;
+            $action = 'Minus';
+            $type = 'Sales';
+            $remarks_new = 'Sales bill: ' . $Billno;
+
+            for ($i = 0; $i < count($_POST['productArray']); $i++) {
+                $prodName = $_POST['productArray'][$i];
+                $unitName = $_POST['unitArray'][$i];
+                $qty = $_POST['quantityArray'][$i];
+
+                $insert_sql = "INSERT INTO stock (product_name, unit_name, inward_unit, outward_unit, stock_action, stock_type, remarks, sales_id) VALUES (?,?,?,?,?,?,?,?)";
+                $insert_stmt = $conn->prepare($insert_sql);
+                $insert_stmt->bind_param("ssiisssi", $prodName, $unitName, $inward, $qty, $action, $type, $remarks_new, $edit_id);
+                $insert_stmt->execute();
+                $insert_stmt->close();
+            }
+
             header("Location: edit_sales.php?edit_success=1");
             exit;
         }

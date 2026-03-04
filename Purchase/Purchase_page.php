@@ -7,6 +7,8 @@ $Edit = 0;
 $DateErr = $PartyErr = $BillnoErr = $ProductErr = $UnitErr = $QuantityErr = $RateErr = $AmountErr = $tableError = $qty_error = $rate_error = "";
 $Date = $Party = $Billno = $Product = $Unit = $Quantity = $Rate = $Amount = $Total = "";
 
+$stock = $stockErr = "";
+
 $topProduct = '';
 $topUnit = '';
 $topQuantity = '';
@@ -20,7 +22,7 @@ if (isset($_REQUEST['edit_id'])) {
     $sql = "SELECT * FROM Purchase WHERE id='$edit_id'";
     $result = mysqli_query($conn, $sql);
 
-    if (mysqli_num_rows($result) > 0) {
+    if ($result && mysqli_num_rows($result) > 0) {
         $data = mysqli_fetch_assoc($result);
         $Date = $data['date'];
         $Billno = $data['bill_no'];
@@ -190,8 +192,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
             );
 
             $stmt->execute();
-            header("Location: edit_purchase.php?success=1");
-            exit;
+
+            $outward = 0;
+            $action = 'Plus';
+            $type = 'Purchase';
+            $remarks = 'Purchase bill: ' . $Billno;
+
+            for ($i = 0; $i < count($_POST['productArray']); $i++) {
+                $prodName = $_POST['productArray'][$i];
+                $unitName = $_POST['unitArray'][$i];
+                $qty = $_POST['quantityArray'][$i];
+
+                $sql2 = "INSERT INTO stock (product_name, unit_name, inward_unit, outward_unit, stock_action, stock_type, remarks,purchase_id) VALUES (?,?,?,?,?,?,?,?)";
+                $stmt2 = $conn->prepare($sql2);
+                $stmt2->bind_param("ssiisssi", $prodName, $unitName, $qty, $outward, $action, $type, $remarks, $edit_id);
+                $stmt2->execute();
+                $stmt2->close();
+            }
+
         } else {
             $sql = "UPDATE Purchase SET `date`=?, bill_no=?, party_type=?, product=?, unit=?, quantity=?, rate=?, amount=?, total=? WHERE id=?";
 
@@ -209,13 +227,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
                 $Total,
                 $edit_id
             );
-
             $stmt->execute();
+
+            $delete_sql = "DELETE FROM stock WHERE remarks = ? AND stock_type = 'Purchase'";
+            $delete_stmt = $conn->prepare($delete_sql);
+            $delete_stmt->bind_param("i", $edit_id);
+            $delete_stmt->execute();
+            $delete_stmt->close();
+
+            $outward = 0;
+            $action = 'Plus';
+            $type = 'Purchase';
+            $remarks_new = 'Purchase bill: ' . $Billno;
+
+            for ($i = 0; $i < count($_POST['productArray']); $i++) {
+                $prodName = $_POST['productArray'][$i];
+                $unitName = $_POST['unitArray'][$i];
+                $qty = $_POST['quantityArray'][$i];
+
+                $insert_sql = "INSERT INTO stock (product_name, unit_name, inward_unit, outward_unit, stock_action, stock_type, remarks, purchase_id) VALUES (?,?,?,?,?,?,?,?)";
+                $insert_stmt = $conn->prepare($insert_sql);
+                $insert_stmt->bind_param("ssiisssi", $prodName, $unitName, $qty, $outward, $action, $type, $remarks_new, $edit_id);
+                $insert_stmt->execute();
+                $insert_stmt->close();
+            }
+
             header("Location: edit_purchase.php?edit_success=1");
             exit;
         }
     }
 }
+
 
 function test_input($data)
 {
@@ -486,6 +528,18 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
     </footer>
 
     <script src="script.js"></script>
+    <script>
+        $(document).ready(function () {
+            var jsProduct = <?php echo json_encode($Product_name); ?>;
+            console.log(jsProduct); // Now accessible in jQuery
+
+            var jsUnit = <?php echo json_encode($Unit_name); ?>;
+            console.log(jsUnit);
+
+            var jsQuantity = <?php echo json_encode($Quantity_value); ?>;
+            console.log(jsQuantity);
+        });
+    </script>
 </body>
 
 </html>

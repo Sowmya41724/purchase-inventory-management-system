@@ -5,11 +5,9 @@ $edit_id = "";
 $Edit = 0;
 $message = "";
 
-$ProductName = $Unit_Value = $Rate = "";
-$ProductNameErr = $Unit_ValueErr = $RateErr = "";
+$ProductName = $Unit_Value = $Rate = $i_stock = "";
+$ProductNameErr = $Unit_ValueErr = $RateErr = $i_stockErr = "";
 
-$stock = $inward = $inwardErr = $action = $type = $remarks = "";
-$outward = 0;
 
 if (isset($_REQUEST['edit_id'])) {
     $edit_id = $_REQUEST['edit_id'];
@@ -18,12 +16,23 @@ if (isset($_REQUEST['edit_id'])) {
     $sql = "SELECT * FROM Product WHERE id='$edit_id'";
     $result = mysqli_query($conn, $sql);
 
-    if (!empty($result)) {
-        foreach ($result as $data) {
-            $ProductName = $data['product_name'];
-            $Unit_Value = $data['unit_name'];
-            $Rate = $data['rate'];
+    if ($result && mysqli_num_rows($result) > 0) {
+        $data = mysqli_fetch_assoc($result);
+        $ProductName = $data['product_name'];
+        $Unit_Value = $data['unit_name'];
+        $Rate = $data['rate'];
+
+        $stock_sql = "SELECT id, inward_unit FROM stock WHERE product_name = ? AND stock_type = 'Opening stock' LIMIT 1";
+        $stmt_stock = $conn->prepare($stock_sql);
+        $stmt_stock->bind_param("s", $ProductName);
+        $stmt_stock->execute();
+        $stock_result = $stmt_stock->get_result();
+        if ($stock_result->num_rows > 0) {
+            $stock_data = $stock_result->fetch_assoc();
+            $stock_id = $stock_data['id'];
+            $i_stock = $stock_data['inward_unit'];
         }
+        $stmt_stock->close();
     }
 }
 
@@ -38,7 +47,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error = 1;
     } else {
         $ProductName = test_input($_POST["name"]);
-        $stock = 1;
         if (!preg_match("/^[A-Za-z-' ]*$/", $ProductName)) {
             $ProductNameErr = "Only letters and space are allowed";
             $error = 1;
@@ -85,53 +93,70 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    if (empty($_POST["stock"])) {
-        $inwardErr = "Stock is Required";
+    if (empty($_POST["i_stock"])) {
+        $i_stockErr = "Stock is Required";
         $error = 1;
     } else {
-        $inward = test_input($_POST["stock"]);
-        if (!preg_match("/^[0-9]*$/", $inward)) {
-            $inwardErr = "Only numbers are allowed";
+        $i_stock = test_input($_POST["i_stock"]);
+        if (!preg_match("/^[0-9]*$/", $i_stock)) {
+            $i_stockErr = "Only numbers are allowed";
             $error = 1;
-        } else {
-            if ($Edit == 0) {
-                $sql = "SELECT id FROM stock WHERE inward_unit = ? AND id != ?";
-                $result = $conn->execute_query($sql, [$stock, $edit_id]);
-            }
         }
     }
+
 
     if ($error === 0) {
         if ($Edit == 0) {
             $sql = "INSERT INTO Product (product_name, unit_name, rate) VALUES (?,?,?)";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("sss", $ProductName, $Unit_Value, $Rate);
-
             $stmt->execute();
+            $stmt->close();
+
+            $outward = 0;
+            $action = 'Plus';
+            $type = 'Opening stock';
+            $remarks = $ProductName;
+
+            $sql2 = "INSERT INTO stock (product_name, unit_name, inward_unit, outward_unit, stock_action, stock_type, remarks) VALUES (?,?,?,?,?,?,?)";
+            $stmt2 = $conn->prepare($sql2);
+            $stmt2->bind_param("ssiisss", $ProductName, $Unit_Value, $i_stock, $outward, $action, $type, $remarks);
+            $stmt2->execute();
+            $stmt2->close();
+
             header("Location: edit_product.php?success=1");
             exit;
-
-            if ($stock == 1) {
-                $sql = "INSERT INTO stock (product_name, unit_name, inward_unit, outward_unit, stock_action, stock_type, remarks) VALUES (?,?,?,?,?,?,?)";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ssis", $ProductName, $Unit_Value, $inward, $outward, $action, $type, $remarks);
-
-                $stmt->execute();
-                exit;
-            }
-
         } else {
             $sql = "UPDATE Product  SET product_name=?, unit_name=?, rate=? WHERE id=?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("sssi", $ProductName, $Unit_Value, $Rate, $edit_id);
 
             $stmt->execute();
+            $stmt->close();
+
+            if ($stock_id > 0) {
+                $sql2 = "UPDATE stock SET inward_unit=? WHERE id=?";
+                $stmt2 = $conn->prepare($sql2);
+                $stmt2->bind_param("ii", $i_stock, $stock_id);
+                $stmt2->execute();
+                $stmt2->close();
+            } else {
+                $outward = 0;
+                $action = 'Plus';
+                $type = 'Opening stock';
+                $remarks = $ProductName;
+                $sql2 = "INSERT INTO stock (product_name, unit_name, inward_unit, outward_unit, stock_action, stock_type, remarks) VALUES (?,?,?,?,?,?,?)";
+                $stmt2 = $conn->prepare($sql2);
+                $stmt2->bind_param("ssiisss", $ProductName, $Unit_Value, $i_stock, $outward, $action, $type, $remarks);
+                $stmt2->execute();
+                $stmt2->close();
+            }
+
             header("Location: edit_product.php?edit_success=1");
             exit;
         }
 
     }
-
 }
 
 function test_input($data)
@@ -173,12 +198,15 @@ if (isset($stmt)) {
     </nav>
 
     <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
+
         <button onclick="location.href='edit_product.php'" Type="button">
             &#8618; Database
         </button>
+
         <h1>Fill the details:</h1>
         <input type="hidden" name="edit_id" value="<?php echo $edit_id; ?>">
-        <label for="name">
+
+        <label for="Product_name">
             <b>
                 Product Name :
             </b>
@@ -187,8 +215,10 @@ if (isset($stmt)) {
             </span>
         </label>
         <br><br>
-        <input type="text" name="name" placeholder="Enter the name...." value="<?php echo $ProductName; ?>">
+        <input type="text" name="name" id="Product_name" placeholder="Enter the name...."
+            value="<?php echo $ProductName; ?>">
         <br><br>
+
         <label for="unit">
             <b>
                 Unit :
@@ -219,7 +249,8 @@ if (isset($stmt)) {
             ?>
         </select>
         <br><br>
-        <label for="rate">
+
+        <label for="Rate">
             <b>
                 Rate :
             </b>
@@ -228,19 +259,22 @@ if (isset($stmt)) {
             </span>
         </label>
         <br><br>
-        <input type="text" name="rate" placeholder="Enter your rate..." value="<?php echo $Rate; ?>">
+        <input type="text" name="rate" id="Rate" placeholder="Enter your rate..." value="<?php echo $Rate; ?>">
         <br><br>
-        <label for="inward">
+
+        <label for="stock">
             <b>
                 Product Stock :
             </b>
             <span class="error">
-                * <?php echo $inwardErr; ?>
+                * <?php echo $i_stockErr; ?>
             </span>
         </label>
         <br><br>
-        <input type="numeric" name="stock" placeholder="Enter the stock no..." value="<?php echo $inward; ?>">
+        <input type="numeric" name="i_stock" id="stock" placeholder="Enter the stock..."
+            value="<?php echo $i_stock; ?>">
         <br><br><br>
+
         <button id="mySubmit" type="submit" value="Submit" name="submit"
             style="padding: 10px; width: 100%; box-sizing: border-box;">Submit</button>
     </form>
@@ -251,14 +285,7 @@ if (isset($stmt)) {
             <?php echo date("Y"); ?>
         </p>
     </footer>
-    <script>
-        $("#mySubmit").on("click", function () {
-            var action = "";
-            var type = "";
 
-            if (<?php echo $ProductName; ?>)
-        });
-    </script>
 </body>
 
 </html>
