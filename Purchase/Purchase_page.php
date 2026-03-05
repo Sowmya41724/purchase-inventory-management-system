@@ -528,18 +528,6 @@ if (isset($_POST['unit']) && !empty($_POST['unit'])) {
     </footer>
 
     <script src="script.js"></script>
-    <script>
-        $(document).ready(function () {
-            var jsProduct = <?php echo json_encode($Product_name); ?>;
-            console.log(jsProduct); // Now accessible in jQuery
-
-            var jsUnit = <?php echo json_encode($Unit_name); ?>;
-            console.log(jsUnit);
-
-            var jsQuantity = <?php echo json_encode($Quantity_value); ?>;
-            console.log(jsQuantity);
-        });
-    </script>
 </body>
 
 </html>
