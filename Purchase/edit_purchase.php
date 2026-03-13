@@ -60,9 +60,6 @@ if (isset($_REQUEST['delete_id'])) {
                 <th>Billno</th>
                 <th>Product</th>
                 <th>Unit</th>
-                <th>Quantity</th>
-                <th>Rate</th>
-                <th>Amount</th>
                 <th>Total</th>
                 <th>Action</th>
             </tr>
@@ -92,15 +89,6 @@ if (isset($_REQUEST['delete_id'])) {
                             <?php echo $rows['unit']; ?>
                         </td>
                         <td>
-                            <?php echo $rows['quantity']; ?>
-                        </td>
-                        <td>
-                            <?php echo $rows['rate']; ?>
-                        </td>
-                        <td>
-                            <?php echo $rows['amount']; ?>
-                        </td>
-                        <td>
                             <?php echo $rows['total']; ?>
                         </td>
                         <td id="no-hover">
@@ -113,6 +101,12 @@ if (isset($_REQUEST['delete_id'])) {
                                 onclick="location.href='edit_purchase.php?delete_id=<?php echo $rows['id']; ?>'; return confirm('Are you sure you want to delete this record?');"
                                 name="delete" type="submit">
                                 &#x1F5D1;Delete
+                            </button>
+                            <br>
+                            <button
+                                onclick="window.open('../reports/purchase_pdf.php?edit_id=<?php echo $rows['id']; ?>', '_blank')"
+                                name="print" type="submit">
+                                <i class="fa fa-print"> Print</i>
                             </button>
                         </td>
                     </tr>

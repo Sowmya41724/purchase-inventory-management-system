@@ -113,6 +113,12 @@ if (isset($_REQUEST['delete_id'])) {
                                 name="delete" type="submit">
                                 &#x1F5D1;Delete
                             </button>
+                            <br>
+                            <button
+                                onclick="window.open('../reports/sales_pdf.php?edit_id=<?php echo $rows['id']; ?>', '_blank')"
+                                name="print" type="submit">
+                                <i class="fa fa-print"> Print</i>
+                            </button>
                         </td>
                     </tr>
                     <?php
