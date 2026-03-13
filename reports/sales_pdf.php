@@ -115,7 +115,7 @@ $pdf->Cell(0, 4, 'Email: fireworkcrakers@gmail.com', 0, 1, 'C');
 //add line
 $pdf->Line(10, 37, 200, 37);
 
-// ---------- HEADER ROW (Buyer / Delivery Address / Bill No) ----------
+// ---------- (Buyer / Delivery Address / Bill No) ----------
 $pdf->SetXY(10, 39);
 $pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(80, 2, 'Buyer', 0, 0, 'L');
@@ -124,28 +124,27 @@ $pdf->SetFont('Arial', '', 10);
 $pdf->Cell(56, 4, 'Bill no', 0, 0, 'R');
 $pdf->Cell(32, 4, ':' . $Billno, 0, 1, 'R');
 
-// ---------- RIGHT SIDE DETAILS (fixed Y positions) ----------
-$rightX = 136;   // start of right column (after vertical line at 135)
-$rightW = 60;    // width for right column cells
+// ---------- Date (fixed Y positions) ----------
+$rightX = 136;   // start
+$rightW = 60;    // width 
 
-// Dated (Y=44)
 $pdf->SetXY($rightX, 44);
 $pdf->SetFont('Arial', '', 10);
 $pdf->Cell(11, 6, 'Dated', 0, 0, 'R');
 $pdf->Cell(30, 6, ':' . $Date, 0, 1, 'R');
 
-// ---------- BUYER / DELIVERY LINES (dynamic) ----------
+// ---------- Buyer / Delivery (dynamic) ----------
 $startY = 44;          // first line Y
-$lineH = 4;            // height per line (matches original 4mm
+$lineH = 4;            // height per line
 $currentY = $startY;
 
 foreach ($buyer_lines as $line) {
-    // Left column (buyer) – from X=13 to X=75 (width 62)
+    // Left column (buyer)
     $pdf->SetXY(13, $currentY);
     $pdf->SetFont('Arial', '', 9);
     $pdf->Cell(62, $lineH, $line, 0, 0, 'L');
 
-    // Middle column00 (delivery) – from X=76 to X=135 (width 59)
+    // Middle column00 (delivery)
     $pdf->SetXY(79, $currentY);
     $pdf->Cell(62, $lineH, $line, 0, 0, 'L');
 
