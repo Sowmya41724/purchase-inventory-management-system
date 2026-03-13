@@ -144,7 +144,7 @@ foreach ($buyer_lines as $line) {
     $pdf->SetFont('Arial', '', 9);
     $pdf->Cell(62, $lineH, $line, 0, 0, 'L');
 
-    // Middle column00 (delivery)
+    // Middle column (delivery)
     $pdf->SetXY(79, $currentY);
     $pdf->Cell(62, $lineH, $line, 0, 0, 'L');
 
@@ -193,11 +193,11 @@ foreach ($sales_data_rows as $sales) {
     $amounts = explode(',', $sales['amount']);
 
     for ($i = 0; $i < count($products); $i++) {
-        $pdf->Cell(10, 10, $m++, 0, 0, 'L');
-        $pdf->Cell(83, 10, trim($products[$i]), 0, 0, 'L');
-        $pdf->Cell(58, 10, $quantities[$i] . " " . $units[$i], 0, 0, 'C');
-        $pdf->Cell(8, 10, $rates[$i], 0, 0, 'R');
-        $pdf->Cell(30, 10, $amounts[$i], 0, 0, 'R');
+        $pdf->Cell(10, 5, $m++, 0, 0, 'L');
+        $pdf->Cell(83, 5, trim($products[$i]), 0, 0, 'L');
+        $pdf->Cell(58, 5, $quantities[$i] . " " . $units[$i], 0, 0, 'C');
+        $pdf->Cell(8, 5, $rates[$i], 0, 0, 'R');
+        $pdf->Cell(30, 5, $amounts[$i], 0, 0, 'R');
         $pdf->Ln();
         $pdf->SetX(11);
         $product_count++;
@@ -206,7 +206,7 @@ foreach ($sales_data_rows as $sales) {
 
 //adding net rate
 $pdf->SetXY(25, 223.5);
-$pdf->SetFont('Arial', '', 9);
+$pdf->SetFont('Arial', 'I', 9);
 $pdf->Cell(10, 1, '((*) - Net Rated Products.Discount Not Applicable)', 0, 1, 'L');
 
 //adding the lines for total 
@@ -217,7 +217,7 @@ $pdf->Line(10, 227, 200, 227);
 $pdf->SetXY(98, 228.5);
 $pdf->SetFont('Arial', 'B', 9);
 $pdf->Cell(10, 2, 'Total', 0, 0, 'C');
-$pdf->Cell(30, 2, $product_count, 0, 0, 'C');
+$pdf->Cell(33, 2, $product_count, 0, 0, 'C');
 $pdf->Cell(20, 2, 'Sub total', 0, 0, 'R');
 $pdf->Cell(0, 2, $Total, 0, 1, 'R');
 
@@ -265,7 +265,7 @@ $pdf->Cell(185, 3, 'Authorised Signatory', 0, 1, 'R');
 //outside border - at the end
 $pdf->SetXY(10, 270);
 $pdf->SetFont('Arial', 'B', 9);
-$pdf->Cell(180, 5, '**Composition dealer is not eligible to collect the taxes on supply.**', 0, 0, 'C');
+$pdf->Cell(180, 5, '***Composition dealer is not eligible to collect the taxes on supply.***', 0, 0, 'C');
 $pdf->SetFont('Arial', 'I', 8);
 $pdf->Cell(10, 5, 'Page No : 1/1', 0, 1, 'R');
 
