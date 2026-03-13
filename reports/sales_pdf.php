@@ -115,7 +115,7 @@ $pdf->Cell(0, 4, 'Email: fireworkcrakers@gmail.com', 0, 1, 'C');
 //add line
 $pdf->Line(10, 37, 200, 37);
 
-// ---------- HEADER ROW (Buyer / Delivery Address / Invoice No) ----------
+// ---------- HEADER ROW (Buyer / Delivery Address / Bill No) ----------
 $pdf->SetXY(10, 39);
 $pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(80, 2, 'Buyer', 0, 0, 'L');

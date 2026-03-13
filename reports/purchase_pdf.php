@@ -6,6 +6,7 @@ $Date = $Party = $Billno = $Product = $Unit = $Quantity = $Rate = $Amount = $Tot
 $Name = $Mobileno = $Address = $City = $Pincode = $Email = $Party_type = "";
 $purchase_data_rows = [];
 $party_data_rows = [];
+$buyer_lines = [];
 
 if (isset($_REQUEST['edit_id'])) {
     $edit_id = $_REQUEST['edit_id'];
@@ -57,6 +58,32 @@ foreach ($party_data_rows as $party) {
     $Party_type = $party['party_type'];
 }
 
+$buyer_lines = [];
+
+if (!empty($Name)) {
+    $buyer_lines[] = $Name;
+}
+if (!empty($Address)) {
+    $buyer_lines[] = $Address;
+}
+// Combine City and Pincode into one line if at least one exists
+$city_line = '';
+if (!empty($City)) {
+    $city_line .= $City;
+}
+if (!empty($Pincode)) {
+    $city_line .= ($city_line ? ' - ' : '') . $Pincode;
+}
+if (!empty($city_line)) {
+    $buyer_lines[] = $city_line;
+}
+if (!empty($Mobileno)) {
+    $buyer_lines[] = 'Ph: ' . $Mobileno;
+}
+if (!empty($Email)) {
+    $buyer_lines[] = 'Email: ' . $Email;
+}
+
 $pdf = new FPDF('P', 'mm', 'A4');
 
 //Margin -> Left, Top, Right
@@ -86,56 +113,49 @@ $pdf->Cell(0, 4, 'Email: fireworkcrackers@gmail.com', 0, 1, 'C');
 //add line
 $pdf->Line(10, 37, 200, 37);
 
-//After line - Buyer
+
+// ---------- HEADER ROW (Buyer / Bill No) ----------
 $pdf->SetXY(10, 39);
 $pdf->SetFont('Arial', 'B', 10);
-$pdf->Cell(80, 2, 'Buyer', 0, 1, 'L');
-
-if ($Party) {
-    foreach ($party_data_rows as $party) {
-        $Name = $party['name'];
-        $Mobileno = $party['mobile_no'];
-        $Address = $party['address'];
-        $City = $party['city'];
-        $Pincode = $party['pincode'];
-        $Email = $party['email'];
-        $Party_type = $party['party_type'];
-
-
-        $pdf->SetXY(13, 44);
-        $pdf->SetFont('Arial', 'B', 9);
-        $pdf->Cell(81, 2, $Name . ',', 0, 1, 'L');
-
-        $pdf->SetFont('Arial', '', 9);
-        $pdf->SetXY(13, 47);
-        $pdf->Cell(70, 3, $Address, 0, 1, 'L');
-
-        $pdf->SetXY(13, 51);
-        $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(70, 3, $City . ' - ' . $Pincode, 0, 1, 'L');
-
-        $pdf->SetXY(13, 55);
-        $pdf->SetFont('Arial', '', 9);
-        $pdf->Cell(70, 3, 'Ph: ' . $Mobileno, 0, 1, 'L');
-
-        $pdf->SetXY(13, 59);
-        $pdf->Cell(70, 3, 'Email: ' . $Email, 0, 1, 'L');
-
-    }
-}
-//after line - invoice details
-$pdf->SetXY(120, 40);
+$pdf->Cell(80, 2, 'Buyer', 0, 0, 'L');
 $pdf->SetFont('Arial', '', 10);
-$pdf->Cell(20, 4, 'Bill No', 0, 0, 'L');
-$pdf->Cell(5, 4, ':' . $Billno, 0, 1, 'L');
-$pdf->SetXY(120, 45);
-$pdf->Cell(20, 6, 'Dated', 0, 0, 'L');
-$pdf->Cell(5, 6, ':' . $Date, 0, 1, 'L');
+$pdf->Cell(41, 4, 'Bill no', 0, 0, 'R');
+$pdf->Cell(14, 4, ':' . $Billno, 0, 1, 'R');
+
+// ---------- RIGHT SIDE DETAILS (fixed Y positions) ----------
+$rightX = 120;   // start of right column (after vertical line at 135)
+$rightW = 60;    // width for right column cells
+
+// Dated (Y=44)
+$pdf->SetXY($rightX, 44);
+$pdf->SetFont('Arial', '', 10);
+$pdf->Cell(11, 6, 'Dated', 0, 0, 'R');
+$pdf->Cell(30, 6, ':' . $Date, 0, 1, 'R');
+
+// ---------- BUYER (dynamic) ----------
+$startY = 44;          // first line Y
+$lineH = 4;            // height per line (matches original 4mm
+$currentY = $startY;
+
+foreach ($buyer_lines as $line) {
+    // Left column (buyer) – from X=13 to X=75 (width 62)
+    $pdf->SetXY(13, $currentY);
+    $pdf->SetFont('Arial', '', 9);
+    $pdf->Cell(62, $lineH, $line, 0, 0, 'L');
+
+    $currentY += $lineH;
+}
 
 
 //adding the box
 $pdf->Line(119, 37, 119, 64);
 $pdf->Line(10, 64, 200, 64);
+
+$tableStartY = 70; // original table Y
+if ($currentY + 2 > $tableStartY) {
+    // if buyer lines pushed Y lower, adjust table start
+    $tableStartY = $currentY + 5;
+}
 
 //adding the table tittle
 $pdf->SetXY(11, 70);
